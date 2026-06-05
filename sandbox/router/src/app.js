@@ -5,8 +5,6 @@ import { createProxyMiddleware } from "http-proxy-middleware"
 
 const app = express()
 app.use(morgan("combined"))
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
 
 app.get("/api/status/healthz", (req, res) => {
     res.status(200).json({
