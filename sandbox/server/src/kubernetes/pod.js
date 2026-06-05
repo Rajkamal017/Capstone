@@ -14,11 +14,31 @@ export async function createPod(sandboxId) {
             }
         },
         spec: {
+            volumes: [
+                {
+                    name: "workspace-volume",
+                    emptyDir: {}
+                }
+            ],
+            initContainers: [
+                {
+                    name: "workspace-init",
+                    image: "sandbox-template:dev",
+                    imagePullPolicy: "IfNotPresent",
+                    command: ["sh", "-c", "cp -a /workspace/. /workspace-volume/"],
+                    volumeMounts: [
+                        {
+                            name: "workspace-volume",
+                            mountPath: "/workspace-volume"
+                        }
+                    ]
+                }
+            ],
             restartPolicy: "Never",
             containers: [
                 {
-                    image: "sandbox-template:latest",
-                    imagePullPolicy: "Never",
+                    image: "sandbox-template:dev",
+                    imagePullPolicy: "IfNotPresent",
                     name: "sandbox-container",
                     ports: [{
                         containerPort: 5173,
@@ -51,7 +71,34 @@ export async function createPod(sandboxId) {
                         initialDelaySeconds: 20,
                         periodSeconds: 5,
                         timeoutSeconds: 3
-                    }
+                    },
+                    volumeMounts: [
+                        {
+                            name: "workspace-volume",
+                            mountPath: "/workspace"
+                        }
+                    ]
+                    
+                },
+
+                {
+                    image: "agent:dev",
+                    imagePullPolicy: "IfNotPresent",
+                    name: "agent-container",
+                    ports: [{
+                        containerPort: 3000,
+                        name: "http"
+                    }],
+                    resources: {
+                        limits: { cpu: "500m", memory: "1Gi" },
+                        requests: { cpu: "250m", memory: "500Mi" }
+                    },
+                    volumeMounts: [
+                        {
+                            name: "workspace-volume",
+                            mountPath: "/workspace"
+                        }
+                    ]
                 }
             ]
         }
