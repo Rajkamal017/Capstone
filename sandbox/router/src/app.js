@@ -44,8 +44,8 @@ function getAgentProxy(sandboxId) {
 
     const target = `http://sandbox-service-${sandboxId}:3000`
 
-    if (!proxies[sandboxId]) {
-        proxies[sandboxId] = createProxyMiddleware({
+    if (!agentProxies[sandboxId]) {
+        agentProxies[sandboxId] = createProxyMiddleware({
             target,
             changeOrigin: true,
             ws: true,
