@@ -16,6 +16,7 @@ spec:
     spec:
       containers:
       - image:  router:target-scope-fix
+        imagePullPolicy: Never
         name:  router-server
         resources:
           requests:
