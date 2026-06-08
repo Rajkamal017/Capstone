@@ -37,7 +37,7 @@ export async function createPod(sandboxId) {
             restartPolicy: "Never",
             containers: [
                 {
-                    image: "sandbox-template:dev",
+                    image: "template",
                     imagePullPolicy: "IfNotPresent",
                     name: "sandbox-container",
                     ports: [{
@@ -82,7 +82,7 @@ export async function createPod(sandboxId) {
                 },
 
                 {
-                    image: "agent:dev",
+                    image: "agent",
                     imagePullPolicy: "IfNotPresent",
                     name: "agent-container",
                     ports: [{
