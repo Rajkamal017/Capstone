@@ -4,17 +4,15 @@ import * as z from "zod";
 
 
 export const listFiles = tool(
-    async () => {
-        console.log("==========================================")
-        console.log("Using list files tool",)
-        console.log("==========================================")
+    async ({ }, config) => {
 
+        const writer = config.writer;
 
-        const response = await axios.get('http://019ea2de-0884-72dc-b355-c93a7ae67201.agent.localhost/list-files');
+        writer("Listing files in project directory...\n" )
 
-        console.log("==========================================")
-        console.log("response from list files tool", response.data)
-        console.log("==========================================")
+        const response = await axios.get(`http://sandbox-service-${config.context.projectId}:3000/list-files`);
+
+        writer("Files listed successfully." + "Files:" + response.data.files.join(",") + "\n")
 
         return JSON.stringify(response.data.files);
     }, {
@@ -25,18 +23,14 @@ export const listFiles = tool(
 });
 
 export const readFiles = tool(
-    async ({ files: [] }) => {
+    async ({ files  = [] }, config) => {
 
-        console.log("==========================================")
-        console.log("Using read files tool with files", files)
-        console.log("==========================================")
+        const writer = config.writer;
+        writer("Reading files..." + files.join(",") + "\n")
 
-        const response = await axios.get("http://019ea2de-0884-72dc-b355-c93a7ae67201.agent.localhost/read-file?files=" + files.join(","));
+        const response = await axios.get(`http://sandbox-service-${config.context.projectId}:3000/read-file?files=` + files.join(","));
 
-        console.log("==========================================")
-        console.log("response from read files tool", response.data)
-        console.log("==========================================")
-
+        writer("Files read successfully.\n")
         return JSON.stringify(response.data.files);
     }, {
     name: 'read_files',
@@ -48,23 +42,20 @@ export const readFiles = tool(
 });
 
 export const updateFiles = tool(
-    async ({ files }) => {
+    async ({ files = [] }, config) => {
 
-        console.log("==========================================")
-        console.log("Using update files tool with files", files)
-        console.log("==========================================")
+        const writer = config.writer;
+        writer("Updating files..." + files.map(f => f.file).join(",")+ "\n")
 
-        const response = await axios.patch("http://019ea2de-0884-72dc-b355-c93a7ae67201.agent.localhost/update-file", { updates: files });
+        const response = await axios.patch(`http://sandbox-service-${config.context.projectId}:3000/update-file`, { updates: files });
 
-        console.log("==========================================")
-        console.log("response from update files tool", response.data)
-        console.log("==========================================")
+        writer("Files updated successfully.\n")
 
         return JSON.stringify(response.data.results);
     },
     {
         name: 'update_files',
-        description: 'Update the content of a specific file in the protected directory. This is useful for modifying the contents of files that have been listed using the listFiles tool. This tool can be used to create new files or update existing files. The input should be an array of objects, where each object specifies the name of the file to update and the new content to write to that file.',
+        description: 'Create or update files in the project..',
         schema: z.object({
             files: z.array(
                 z.object({

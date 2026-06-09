@@ -22,8 +22,8 @@ export async function createPod(sandboxId) {
             ],
             initContainers: [
                 {
-                    name: "workspace-init",
-                    image: "sandbox-template:dev",
+                    name: "workspace-init", //  Yaha (init-container) = name hain
+                    image: "template", // (template) name hain 
                     imagePullPolicy: "IfNotPresent",
                     command: ["sh", "-c", "cp -a /workspace/. /workspace-volume/"],
                     volumeMounts: [
