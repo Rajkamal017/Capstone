@@ -11,6 +11,10 @@ metadata:
 
     # Time in seconds to establish a connection to the pod
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+
+    nginx.ingress.kubernnetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "router"
+
   labels:
     app.kubernetes.io/name: codespace-ingress
 spec:

@@ -3,14 +3,37 @@ import morgan from 'morgan';
 import fs from 'fs';
 import path from 'path';
 import cors from 'cors';
+import { Server } from 'socket.io';
+import http from "http"
+import pty from 'node-pty';
+import os from 'os';
+
+
+// ===============================================
+// CRITICAL FIX: Shell must be at the very top
+// ===============================================
+const shell = process.env.SHELL ||
+    (os.platform() === 'win32' ? 'powershell.exe' : 'bash');
+
 
 const WORKING_DIR = "/workspace";
 
+
 const app = express();
+const httpServer = http.createServer(app)
+
+
 app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST", "PATCH"]
+    }
+})
 
 app.get('/', (req, res) => {
     res.status(200).json({
@@ -18,6 +41,36 @@ app.get('/', (req, res) => {
         status: 'success',
     });
 });
+
+
+// Spawn the PTY process 
+const ptyProcess = pty.spawn(shell, [], {
+    name: 'xterm-color',
+    cols: 80,
+    rows: 30,
+    cwd: "/workspace",
+    env: process.env
+});
+
+ptyProcess.onData((data) => {
+    io.emit("terminal-output", data);
+});
+
+ptyProcess.onExit(({ exitCode, signal }) => {
+    console.log(`PTY process exited with code: ${exitCode}, signal: ${signal}`);
+});
+
+io.on("connection", (socket) => {
+    console.log("Client connected:" + socket.id)
+
+    socket.on("terminal-input", (data) => {
+        ptyProcess.write(data)
+    })
+
+    socket.on("disconnect", () => {
+        console.log("Client disconnected:" + socket.id);
+    })
+})
 
 /**
  * @route GET /list-files
@@ -44,7 +97,7 @@ app.get("/list-files", async (req, res) => {
             if (entry.isDirectory()) {
                 files.push(...await listFiles(fullPath, baseDir)); // Recursively list files in subdirectories
             } else {
-                files.push(relativePath); 
+                files.push(relativePath);
             }
         }
         return files;
@@ -62,7 +115,7 @@ app.get("/list-files", async (req, res) => {
             status: "error"
         })
     }
-    
+
 });
 
 
@@ -83,7 +136,7 @@ app.get("/read-files", async (req, res) => {
     const fileList = files.split(",");
     const results = await Promise.all(fileList.map(async (file) => {
         const filePath = path.join(WORKING_DIR, file);
-        
+
         try {
             const content = await fs.promises.readFile(filePath, "utf-8");
             return {
@@ -175,4 +228,4 @@ app.post("/create-file", async (req, res) => {
 
 })
 
-export default app;
+export default httpServer;

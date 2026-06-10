@@ -1,4 +1,11 @@
-FROM node:20-alpine
+FROM node:20-bullseye
+
+# Install system dependencies required to build node-pty
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
