@@ -6,9 +6,9 @@ import * as z from "zod";
 export const listFiles = tool(
     async ({ }, config) => {
 
-        const writer = config.writer;
+        const writer = config.context?.writer ?? (() => { });
 
-        writer("Listing files in project directory...\n" )
+        writer("Listing files in project directory...\n")
 
         const response = await axios.get(`http://sandbox-service-${config.context.projectId}:3000/list-files`);
 
@@ -23,7 +23,7 @@ export const listFiles = tool(
 });
 
 export const readFiles = tool(
-    async ({ files  = [] }, config) => {
+    async ({ files = [] }, config) => {
 
         const writer = config.writer;
         writer("Reading files..." + files.join(",") + "\n")
@@ -44,8 +44,9 @@ export const readFiles = tool(
 export const updateFiles = tool(
     async ({ files = [] }, config) => {
 
-        const writer = config.writer;
-        writer("Updating files..." + files.map(f => f.file).join(",")+ "\n")
+        const writer = config.context?.writer ?? (() => {});
+        
+        writer("Updating files..." + files.map(f => f.file).join(",") + "\n")
 
         const response = await axios.patch(`http://sandbox-service-${config.context.projectId}:3000/update-file`, { updates: files });
 
