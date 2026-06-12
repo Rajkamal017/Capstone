@@ -6,8 +6,17 @@ build:
     sha256: {}
     
   artifacts:
+
     - image: ai-orchestration
       context: ai-orchestration
+      docker: 
+        dockerfile: dockerfile
+      sync:
+        infer:
+          - "src/**"
+
+    - image: auth
+      context: auth
       docker: 
         dockerfile: dockerfile
       sync:
@@ -39,6 +48,8 @@ manifests:
   rawYaml:
     - k8s/ai-deployment.yml
     - k8s/ai-service.yml
+    - k8s/auth-deployment.yml
+    - k8s/auth-service.yml
     - k8s/sandbox-deployment.yml
     - k8s/sandbox-service.yml
     - k8s/ingress.yml

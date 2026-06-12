@@ -203,7 +203,7 @@ export default function AiChat({ sandboxId, onFilesChanged }) {
         </div>
         <div>
           <h2 className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>AI Assistant</h2>
-          <p className="text-xs" style={{ color: '#475569' }}>Powered by Gemini</p>
+          <p className="text-xs" style={{ color: '#475569' }}>Powered by MistralAI</p>
         </div>
         <div className="ml-auto flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#10b981', boxShadow: '0 0 6px #10b981' }} />
