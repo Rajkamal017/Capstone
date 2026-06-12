@@ -1,6 +1,7 @@
 import { Router } from "express";
-import User from "../models/user.model.js"
-import passport from "passport"
+import User from "../models/user.model.js";
+import passport from "passport";
+import jwt from "jsonwebtoken";
 
 const router = Router()
 
@@ -23,7 +24,7 @@ router.get("/google/callback", passport.authenticate("google", {
                 user = new User({
                     googleId: id,
                     email: emails[0].value,
-                    name: displayName,
+                    displayName: displayName,
                     avatar: photos && photos.length > 0 ? photos[0].value : ""
                 });
                 await user.save();
