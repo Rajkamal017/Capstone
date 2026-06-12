@@ -33,14 +33,17 @@ export const createService = async (sandboxId) => {
         }
     }
 
-    const response = await K8sCoreV1Api.createNamespacedService("default", serviceManifest);
+    const response = await K8sCoreV1Api.createNamespacedService({
+        namespace: "default",
+        body: serviceManifest
+    });
     return response;
 } 
 
 export async function deleteService(sandboxId){
-    const response = await K8sCoreV1Api.deleteNamespacedService(
-        `sandbox-service-${sandboxId}`,
-        "default"
-    );
+    const response = await K8sCoreV1Api.deleteNamespacedService({
+        name: `sandbox-service-${sandboxId}`,
+        namespace: "default"
+    });
     return response;
 }

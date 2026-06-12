@@ -103,18 +103,19 @@ export async function createPod(sandboxId) {
         }
     }
 
-    const response = await K8sCoreV1Api.createNamespacedPod("default", podManifest);
+    const response = await K8sCoreV1Api.createNamespacedPod({
+        namespace: "default",
+        body: podManifest
+    });
 
     return response;
 }
 
 export async function deletePod(sandboxId) {
-    const response = await K8sCoreV1Api.deleteNamespacedPod(
-        `sandbox-pod-${sandboxId}`,
-        "default",
-        undefined,
-        undefined,
-        0
-    );
+    const response = await K8sCoreV1Api.deleteNamespacedPod({
+        name: `sandbox-pod-${sandboxId}`,
+        namespace: "default",
+        gracePeriodSeconds: 0
+    });
     return response;
 }
