@@ -1,9 +1,12 @@
 import "dotenv/config"
 import app from "./src/app.js";
+import connectdb from "./src/config/db.js";
+
+
+connectdb()
 
 const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
     console.log(`Sandbox API is running on port ${PORT}`)
 })
-

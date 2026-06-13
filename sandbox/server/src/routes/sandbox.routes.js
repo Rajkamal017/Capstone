@@ -23,7 +23,7 @@ router.post("/project", authMiddleware, async (req,res) => {
     })
 })
 
-router.post("/api/sandbox/start", authMiddleware, async (req, res) => {
+router.post("/start", authMiddleware, async (req, res) => {
 
     try {
         const projectId = req.body.projectId;
