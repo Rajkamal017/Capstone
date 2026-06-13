@@ -54,7 +54,7 @@ router.get("/google/callback", passport.authenticate("google", {
                 httpOnly: true
             })
 
-            res.redirect("/");
+            res.redirect("http://localhost:5173");
 
         } catch (error) {
             console.log("Error during Google authentication:", error);

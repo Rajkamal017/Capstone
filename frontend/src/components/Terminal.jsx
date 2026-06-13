@@ -59,7 +59,7 @@ export default function Terminal({ sandboxId }) {
     fitAddonRef.current = fitAddon
 
     term.writeln('\x1b[36m╔══════════════════════════════════════╗\x1b[0m')
-    term.writeln('\x1b[36m║   \x1b[1mSandbox Terminal\x1b[0m\x1b[36m                  ║\x1b[0m')
+    term.writeln('\x1b[36m║\x1b[1mSandbox Terminal\x1b[0m\x1b[36m║\x1b[0m')
     term.writeln('\x1b[36m╚══════════════════════════════════════╝\x1b[0m')
     term.writeln('')
     term.writeln('\x1b[33mConnecting to sandbox...\x1b[0m')
