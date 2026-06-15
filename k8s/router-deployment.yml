@@ -15,7 +15,7 @@ spec:
         app: router
     spec:
       containers:
-      - image:  router
+      - image:  577002943689.dkr.ecr.ap-south-1.amazonaws.com/router
         name:  router-server
         resources:
           requests:
