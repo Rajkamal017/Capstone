@@ -16,7 +16,7 @@ export default defineConfig({
     proxy: {
       // REST API — forwarded to the backend/ingress
       "/api": {
-        target: "http://localhost:8080",
+        target: "http://localhost:80",
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {
