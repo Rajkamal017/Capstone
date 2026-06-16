@@ -8,6 +8,7 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5173,
+    allowedHosts: true,
     hmr: {
       // Stabilise HMR — prevents reloads triggered by unrelated socket errors.
       clientPort: 5173,
@@ -15,7 +16,7 @@ export default defineConfig({
     proxy: {
       // REST API — forwarded to the backend/ingress
       "/api": {
-        target: "http://127.0.0.1:80",
+        target: "http://localhost:8080",
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {

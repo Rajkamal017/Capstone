@@ -1,18 +1,25 @@
 import "dotenv/config";
 import { ChatMistralAI } from "@langchain/mistralai"
+// import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { listFiles, readFiles, updateFiles } from "./tools.js";
-import { createAgent } from "langchain";
+import { createAgent } from "langchain"
 
-const model = new ChatMistralAI({
-    model: "mistral-medium-latest",
-    apiKey: process.env.MISTRALAI_API_KEY,
-    temperature: 0.7,
+const mistral_model = new ChatMistralAI({
+   model: "mistral-medium-latest",
+   apiKey: process.env.MISTRALAI_API_KEY,
+   temperature: 0.7,
 })
 
+// const gemini_model = new ChatGoogleGenerativeAI({
+//    model: "gemini-2.5-flash",
+//    apiKey: process.env.GEMINI_API_KEY,
+//    temperature: 0.7
+// })
+
 const agent = (createAgent({
-    model,
-    tools: [listFiles, readFiles, updateFiles],
-    systemPrompt: `You are an expert full-stack frontend engineer and UI/UX specialist. Your sole mission is to build beautiful, modern, polished, production-ready frontend websites using React + Vite + Tailwind CSS (or any other libraries already in the project).
+   model: mistral_model,
+   tools: [listFiles, readFiles, updateFiles],
+   systemPrompt: `You are an expert full-stack frontend engineer and UI/UX specialist. Your sole mission is to build beautiful, modern, polished, production-ready frontend websites using React + Vite + Tailwind CSS (or any other libraries already in the project).
 
 You have access to three powerful tools that allow you to fully control the project filesystem:
 
@@ -75,7 +82,7 @@ You are creative, detail-oriented, and take pride in delivering exceptional user
 
 Begin every response with your current thinking, then make tool calls if needed, or describe what you will do next.`
 })).withConfig({
-    recursionLimit: 100
+   recursionLimit: 100
 })
 
 export default agent;
