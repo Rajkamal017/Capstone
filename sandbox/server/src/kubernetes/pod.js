@@ -22,7 +22,7 @@ export async function createPod(sandboxId, projectId) {
             initContainers: [
                 {
                     name: "workspace-init", //  Yaha (init-container) = name hain
-                    image: "577002943689.dkr.ecr.ap-south-1.amazonaws.com/template", // (template) name hain 
+                    image: "template", // (template) name hain 
                     imagePullPolicy: "IfNotPresent",
                     command: ["sh", "-c", "cp -a /workspace/. /workspace-volume/"],
                     volumeMounts: [
@@ -36,7 +36,7 @@ export async function createPod(sandboxId, projectId) {
             restartPolicy: "Never",
             containers: [
                 {
-                    image: "577002943689.dkr.ecr.ap-south-1.amazonaws.com/template",
+                    image: "template",
                     imagePullPolicy: "IfNotPresent",
                     name: "sandbox-container",
                     ports: [{
@@ -81,7 +81,7 @@ export async function createPod(sandboxId, projectId) {
                 },
 
                 {
-                    image: "577002943689.dkr.ecr.ap-south-1.amazonaws.com/agent",
+                    image: "agent",
                     imagePullPolicy: "IfNotPresent",
                     name: "agent-container",
                     ports: [{
@@ -100,7 +100,7 @@ export async function createPod(sandboxId, projectId) {
                     ]
                 },
                 {
-                    image: "577002943689.dkr.ecr.ap-south-1.amazonaws.com/sync-agent",
+                    image: "sync-agent",
                     imagePullPolicy: "IfNotPresent",
                     name: "sync-agent-container",
                     ports: [ {containerPort: 4000, name: "http"}],
