@@ -12,18 +12,19 @@ export async function createSandboxKey(sandboxId) {
     }), 'EX', 60 * 10);
 }
 
-subscriber.config("SET", "notify-keyspace-events", "Ex");
+await subscriber.config("SET", "notify-keyspace-events", "Ex");
 
 subscriber.subscribe("__keyevent@0__:expired")
 
 subscriber.on("message", async(channel, key) => {
-    console.log(`Key expired: ${key}`)
-
-    const sandboxId = key.split(":")[1];
-
-    // Delete the associated Kubernetes resources
-    await deletePod(sandboxId);
-    await deleteService(sandboxId);
+    try {
+        const sandboxId = key.split(":")[1];
+        await deletePod(sandboxId);
+        await deleteService(sandboxId);
+    } catch(error) {
+        console.error(`Failed to clean up sandbox ${key}:`, error);
+        // subscriber keeps running — other expirations still handled
+    }
 })
 
 

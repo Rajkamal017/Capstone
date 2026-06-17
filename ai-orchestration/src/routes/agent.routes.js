@@ -4,17 +4,24 @@ import agent from "../agents/code.agent.js";
 const agentRouter = Router();
 
 agentRouter.post("/invoke", async (req, res) => {
-    const { message, projectId } = req.body;
-
-    res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive'
-    });
-
-    const writer = (text) => res.write(text);
-
     try {
+        if (!req.body) {
+            return res.status(400).json({ error: "Request body is required" });
+        }
+
+        const { message, projectId } = req.body;
+        if (!message || !projectId) {
+            return res.status(400).json({ error: "message and projectId are required fields" });
+        }
+
+        res.writeHead(200, {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive'
+        });
+
+        const writer = (text) => res.write(text);
+
         const stream = await agent.stream(
             { messages: [ { role: "user", content: message } ] },
             { context: { projectId, writer }, streamMode: "values" }

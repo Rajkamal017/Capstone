@@ -25,6 +25,7 @@ function getProxy(sandboxId) {
         proxies[ sandboxId ] = createProxyMiddleware({
             target,
             changeOrigin: true,
+            // ws: true,
         });
     }
     return proxies[ sandboxId ];
@@ -35,7 +36,8 @@ function getAgentProxy(sandboxId) {
     if (!agentProxies[ sandboxId ]) {
         agentProxies[ sandboxId ] = createProxyMiddleware({
             target,
-            changeOrigin: true
+            changeOrigin: true,
+            // ws: true,
         });
     }
     return agentProxies[ sandboxId ];
@@ -49,15 +51,29 @@ wsProxy.on('error', (err, req, socket) => {
 });
 
 app.use(async (req, res, next) => {
-    const host = req.headers.host;
-    const sandboxId = host.split('.')[ 0 ];
+    try {
+        const host = req.headers.host;
+        if (!host) {
+            return res.status(400).json({ error: "Host header is required" });
+        }
 
-    await refreshTTL(sandboxId);
+        const parts = host.split('.');
+        const sandboxId = parts[0];
+        const subdomain = parts[1];
 
-    if (host.split('.')[ 1 ] === 'agent') {
-        return getAgentProxy(sandboxId)(req, res, next);
-    } else if (host.split('.')[ 1 ] === 'preview') {
-        return getProxy(sandboxId)(req, res, next);
+        await refreshTTL(sandboxId);
+
+        if (subdomain === 'agent') {
+            return getAgentProxy(sandboxId)(req, res, next);
+        } else if (subdomain === 'preview') {
+            return getProxy(sandboxId)(req, res, next);
+        }
+        next();
+    } catch (error) {
+        console.error("Router middleware error:", error);
+        if (!res.headersSent) {
+            res.status(500).json({ error: "Internal router error" });
+        }
     }
 });
 

@@ -10,11 +10,19 @@ export const listFiles = tool(
 
         writer("Listing files in project directory...\n")
 
-        const response = await axios.get(`http://sandbox-service-${config.context.projectId}:3000/list-files`);
-
-        writer("Files listed successfully." + "Files:" + response.data.files.join(",") + "\n")
-
-        return JSON.stringify(response.data.files);
+        try {
+            const response = await axios.get(`http://sandbox-service-${config.context.projectId}:3000/list-files`);
+            if (response.data && response.data.files) {
+                writer("Files listed successfully. Files: " + response.data.files.join(",") + "\n")
+                return JSON.stringify(response.data.files);
+            }
+            throw new Error("Invalid response format from sandbox service");
+        } catch (error) {
+            console.error("Error in listFiles tool:", error);
+            const errMsg = `Failed to list files: ${error.message}`;
+            writer(errMsg + "\n");
+            return JSON.stringify({ error: errMsg });
+        }
     }, {
     name: 'list_files',
     description: 'List all files in the protected directory.This is helpful for understanding what files are available to read. No input is required for this tool.',
@@ -25,16 +33,22 @@ export const listFiles = tool(
 export const readFiles = tool(
     async ({ files = [] }, config) => {
 
-        const writer = config.writer;
+        const writer = config.context?.writer ?? (() => { });
         writer("Reading files..." + files.join(",") + "\n")
 
-        const response = await axios.get(`http://sandbox-service-${config.context.projectId}:3000/read-file?files=` + files.join(","));
-
-        writer("Files read successfully.\n")
-        return JSON.stringify(response.data.files);
+        try {
+            const response = await axios.get(`http://sandbox-service-${config.context.projectId}:3000/read-files?files=` + files.join(","));
+            writer("Files read successfully.\n")
+            return JSON.stringify(response.data.files);
+        } catch (error) {
+            console.error("Error in readFiles tool:", error);
+            const errMsg = `Failed to read files: ${error.message}`;
+            writer(errMsg + "\n");
+            return JSON.stringify({ error: errMsg });
+        }
     }, {
     name: 'read_files',
-    description: 'Read the content of a specific file from the protected directory. This is useful for accessing the contents of files that have been listed using the listFiles tool. The input should be the name of the file you want to read.',
+    description: 'Read the content of a specific file from the protected directory. This is useful for accessing the contents of files that have been listed using the listFiles tool. The input should have the name of the file you want to read.',
     schema: z.object({
         files: z.array(z.string()).describe('The names of the files to read, as returned by the listFiles tool.')
     })
@@ -45,14 +59,18 @@ export const updateFiles = tool(
     async ({ files = [] }, config) => {
 
         const writer = config.context?.writer ?? (() => {});
-        
         writer("Updating files..." + files.map(f => f.file).join(",") + "\n")
 
-        const response = await axios.patch(`http://sandbox-service-${config.context.projectId}:3000/update-file`, { updates: files });
-
-        writer("Files updated successfully.\n")
-
-        return JSON.stringify(response.data.results);
+        try {
+            const response = await axios.patch(`http://sandbox-service-${config.context.projectId}:3000/update-file`, { updates: files });
+            writer("Files updated successfully.\n")
+            return JSON.stringify(response.data.results);
+        } catch (error) {
+            console.error("Error in updateFiles tool:", error);
+            const errMsg = `Failed to update files: ${error.message}`;
+            writer(errMsg + "\n");
+            return JSON.stringify({ error: errMsg });
+        }
     },
     {
         name: 'update_files',

@@ -8,19 +8,24 @@ import Project from "../models/project.model.js"
 
 const router = Router()
 
-router.post("/project", authMiddleware, async (req,res) => {
-    const { title } = req.body
+router.post("/project", authMiddleware, async (req, res) => {
+    try {
+        const { title } = req.body
 
-    const newProject = new Project({
-        user: req.user.id,
-        title
-    })
+        const newProject = new Project({
+            user: req.user.id,
+            title
+        })
 
-    await newProject.save();
-    return res.status(201).json({
-        message: "Project created successfully",
-        project: newProject
-    })
+        await newProject.save();
+        return res.status(201).json({
+            message: "Project created successfully",
+            project: newProject
+        })
+    } catch (error) {
+        console.error("Error creating project:", error)
+        return res.status(500).json({ error: "Failed to create project" })
+    }
 })
 
 router.post("/start", authMiddleware, async (req, res) => {
@@ -28,10 +33,10 @@ router.post("/start", authMiddleware, async (req, res) => {
     try {
         const projectId = req.body.projectId;
 
-        const project = await Project.findOne({ _id: projectId, user: req.user.id});
+        const project = await Project.findOne({ _id: projectId, user: req.user.id });
 
-        if (!project){
-            return res.status(404).json({error: "Project not found or access denied"})
+        if (!project) {
+            return res.status(404).json({ error: "Project not found or access denied" })
         }
 
         //Generate sandbox ID
@@ -59,12 +64,17 @@ router.post("/start", authMiddleware, async (req, res) => {
 })
 
 router.get("/project", authMiddleware, async (req, res) => {
-    const projects = await Project.find({user: req.user.id})
+    try {
+        const projects = await Project.find({ user: req.user.id })
 
-    return res.status(200).json({
-        message: "Projects fetched successfully",
-        projects
-    })
+        return res.status(200).json({
+            message: "Projects fetched successfully",
+            projects
+        })
+    } catch (error) {
+        console.error("Error fetching projects:", error)
+        return res.status(500).json({ error: "Failed to fetch projects" })
+    }
 })
 
 export default router;

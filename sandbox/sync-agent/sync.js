@@ -99,6 +99,8 @@ function startWatcher(hasFiles) {
             }
             await uploadFileToS3(filePath);
         }
+    }).on('error', (error) => {
+        console.error("Chokidar watch error:", error);
     });
 }
 
